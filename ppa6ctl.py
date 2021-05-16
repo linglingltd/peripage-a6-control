@@ -154,7 +154,7 @@ def getDeviceName():
   data = _sock.recv(32)
   
   try:
-    decoded = data.decode("utf-8")
+    decoded = data.decode("ascii")
     return decoded
   except:
     return False
@@ -170,7 +170,7 @@ def getFWDPI():
   data = _sock.recv(32)
   
   try:
-    decoded = data.decode("utf-8")
+    decoded = data.decode("ascii")
     return decoded
   except:
     return False
@@ -187,7 +187,7 @@ def getSerial():
   data = _sock.recv(32)
   
   try:
-    decoded = data.decode("utf-8")
+    decoded = data.decode("ascii")
     return decoded
   except:
     return False

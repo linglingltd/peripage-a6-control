@@ -100,15 +100,21 @@ def _keepaliveFunc():
   
   count = 60
   
-  while connected():
+  while True:
     # Only force communication if nothing is printed now
-    if count == 0 and not _printing:
-      count = 60
-      if not getDeviceName():
+    if not _printing:
+      if not connected():
         break
+        
+      if count == 0:
+        count = 60
 
-    if count > 0:
-      count = count - 1
+        if not getDeviceName():
+          break
+
+      if count > 0:
+        count = count - 1
+
     time.sleep(1)
     
   _keepAliveThread = None
@@ -121,7 +127,7 @@ def reset():
     return error("Printer not connected")
 
   _sock.send(bytes.fromhex("10ff50f1"))
-  data = _sock.recv(1024)
+  data = _sock.recv(32)
   _sock.send(bytes.fromhex("000000000000000000000000"))
   return data
 
@@ -133,7 +139,7 @@ def reset2():
     return error("Printer not connected")
 
   sock.send(bytes.fromhex("10ff100002"))
-  data = sock.recv(1024)
+  data = sock.recv(32)
   return data
 
 
@@ -145,7 +151,7 @@ def getDeviceName():
     return error("Printer not connected")
 
   _sock.send(bytes.fromhex("10ff3011"))
-  data = _sock.recv(1024)
+  data = _sock.recv(32)
   
   try:
     decoded = data.decode("utf-8")
@@ -161,7 +167,7 @@ def getFWDPI():
     return error("Printer not connected")
   
   _sock.send(bytes.fromhex("10ff20f1"))
-  data = _sock.recv(1024)
+  data = _sock.recv(32)
   
   try:
     decoded = data.decode("utf-8")
@@ -178,7 +184,7 @@ def getSerial():
     return error("Printer not connected")
 
   _sock.send(bytes.fromhex("10ff20f2"))
-  data = _sock.recv(1024)
+  data = _sock.recv(32)
   
   try:
     decoded = data.decode("utf-8")
@@ -268,6 +274,9 @@ def printStop():
   
   _sock.send(bytes.fromhex("1b4a4010fffe45"))
   
+  # Get answer code, \xAA seems to be printed successfully
+  data = _sock.recv(32)
+
   _printing = False
   
   return True
